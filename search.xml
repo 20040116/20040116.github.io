@@ -1,17 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>python-study-experience-1</title>
-    <url>/2021/07/11/python-study-experience-1/</url>
-    <content><![CDATA[]]></content>
-      <categories>
-        <category>Study Experience</category>
-      </categories>
-      <tags>
-        <tag>python</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>大一总结</title>
     <url>/2021/07/09/my-first-blog/</url>
     <content><![CDATA[<p><strong>概述：对于每一个学期，我会从“学期伊始”、“学期中”、“期末”三个时间点入手，以“流水账”的形式简单记录一下我的心理状态和日常生活。然后，我会写几件我印象深刻，且对我自己产生比较大影响的事。最后，做一个总结。最后的最后，我会写一下对下个学年的展望和期许。</strong></p>
@@ -121,6 +110,39 @@
       </categories>
       <tags>
         <tag>个人经历分享</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>python-study-experience-1</title>
+    <url>/2021/07/12/python-study-experience-1/</url>
+    <content><![CDATA[<p><strong>引言：最近在自学Python，学习基础部分用的书是《Python编程——从入门到实践》2016版（最新版借不到），很经典的一本书。除了“外星人入侵”和“Web应用程序”这两个项目感觉不是很有必要，其他部分都看完了。然后，在数据可视化的其中一节，我发现了一个书里的bug。如果有最新版书的小伙伴，可以查证一下，看这个bug还在不在。如果有学习Python的好的书或课程，也可以推荐给我一下，不胜感激。</strong></p>
+<h3 id="关于该bug的说明"><a href="#关于该bug的说明" class="headerlink" title="关于该bug的说明"></a>关于该bug的说明</h3><ul>
+<li>位于P349页，”python_repos.py”的部分代码。</li>
+</ul>
+<p><strong>python_repos.py</strong></p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">--snip--</span><br><span class="line"><span class="comment">#研究有关仓库的信息</span></span><br><span class="line">repo_dicts = response_dict[<span class="string">&#x27;item&#x27;</span>]</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Number of items:&quot;</span>, <span class="built_in">len</span>(repo_dicts))</span><br><span class="line"></span><br><span class="line">names, plot_dicts = [], []</span><br><span class="line"><span class="keyword">for</span> repo_dict repodicts:</span><br><span class="line">	names.append(repo_dict[<span class="string">&#x27;name&#x27;</span>])</span><br><span class="line">	</span><br><span class="line">	plot_dict = &#123;</span><br><span class="line">		<span class="string">&#x27;value&#x27;</span>: repo_dict[<span class="string">&#x27;stargazers_count&#x27;</span>],</span><br><span class="line">		<span class="string">&#x27;label&#x27;</span>: repo_dict[<span class="string">&#x27;description&#x27;</span>],</span><br><span class="line">		&#125;</span><br><span class="line">	plot_dicts.append(plot.<span class="built_in">dict</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#可视化</span></span><br><span class="line">my_style = LS(<span class="string">&#x27;#333366&#x27;</span>, base_style=LCS)</span><br><span class="line">--snip--</span><br><span class="line"></span><br><span class="line">chart.add(<span class="string">&#x27;&#x27;</span>, plot_dicts)</span><br><span class="line">chart.render_to_file(<span class="string">&#x27;pthon_repo.svg&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>本节的目的是用API调用返回Github上30个项目，然后按照得到stars的数量排序，利用Pygal做一个条形图。</p>
+</li>
+<li><p>问题出在如上所示代码的第12行“’label’: repo_dict[‘description’]”，这一行的作用是获得每一个项目的“description”。但不是所有的项目都有description(虽然一般受欢迎的项目都有)，我测试代码时获取的前30个项目中的第28名就没有description，然后会报错“NoneType”。具体情况见下图。<img src="https://cdn.jsdelivr.net/gh/20040116/pictures-for-my-blog/bug1.png" width alt="一个大瓜" align="center"></p>
+</li>
+<li><p>解决方法也很简单，就是判断一下有没有“description”.代码如下：</p>
+</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">--snip--</span><br><span class="line"><span class="keyword">for</span> repo_dict <span class="keyword">in</span> repo_dicts:</span><br><span class="line">    names.append(repo_dict[<span class="string">&#x27;name&#x27;</span>])</span><br><span class="line">    stars.append(repo_dict[<span class="string">&#x27;stargazers_count&#x27;</span>])</span><br><span class="line">    plot_dict = &#123;</span><br><span class="line">        <span class="string">&#x27;value&#x27;</span>: repo_dict[<span class="string">&#x27;stargazers_count&#x27;</span>],</span><br><span class="line">        <span class="string">&#x27;xlink&#x27;</span>: repo_dict[<span class="string">&#x27;html_url&#x27;</span>],</span><br><span class="line">        <span class="comment">#&#x27;label&#x27;: repo_dict[&#x27;description&#x27;]</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> repo_dict[<span class="string">&#x27;description&#x27;</span>] == <span class="literal">None</span>:</span><br><span class="line">        plot_dict[<span class="string">&#x27;label&#x27;</span>] = <span class="string">&#x27;No description&#x27;</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        plot_dict[<span class="string">&#x27;label&#x27;</span>] = repo_dict[<span class="string">&#x27;description&#x27;</span>]</span><br><span class="line">    plot_dicts.append(plot_dict)</span><br><span class="line">--snip--</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>正常情况下的运行结果是这样的：<img src="https://cdn.jsdelivr.net/gh/20040116/pictures-for-my-blog/python_repos.svg" width alt="一个大瓜" align="center"><a href="https://cdn.jsdelivr.net/gh/20040116/pictures-for-my-blog/python_repos(2).svg"><strong>该图链接</strong></a></p>
+</li>
+<li><p><strong>但是，为什么这个项目没有description呢？</strong>我很好奇，就去看了看，然后发现一个大瓜，好奇读者可以自行去查看。</p>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>Study Experience</category>
+      </categories>
+      <tags>
+        <tag>python</tag>
       </tags>
   </entry>
 </search>
