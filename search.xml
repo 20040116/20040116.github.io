@@ -1,6 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Mathematical Modeling LearningExperience01</title>
+    <url>/2021/07/13/LearningExperience01/</url>
+    <content><![CDATA[<h2 id="一道例题《数学建模算法与应用》"><a href="#一道例题《数学建模算法与应用》" class="headerlink" title="一道例题《数学建模算法与应用》"></a>一道例题《数学建模算法与应用》</h2><ul>
+<li>例1.3 求解下列线性规划问题（很简单的一道题）：</li>
+</ul>
+<img src="https://cdn.jsdelivr.net/gh/20040116/pictures-for-my-blog/modeling01.png" width="250" alt="modeling1" align="center">
+
+<ul>
+<li>Matlab程序如下：</li>
+</ul>
+<figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">c = [<span class="number">2</span>, <span class="number">3.</span> <span class="number">1</span>];</span><br><span class="line">a = [<span class="number">1</span>, <span class="number">4</span>, <span class="number">2</span>; <span class="number">3</span>, <span class="number">2</span>, <span class="number">0</span>];</span><br><span class="line">b = [<span class="number">8</span>;<span class="number">6</span>];</span><br><span class="line">[x,y] = linprog(c, -a, -b,[],[],<span class="built_in">zeros</span>(<span class="number">3</span>,<span class="number">1</span>),[])</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>书上给出的答案是：最优解为x1=0.8066, x2=1.7900, x3=0.0166，对应的最优解值z=7.0000</li>
+<li>但是，我的运行结果是：x1=2, x2=0, x3=3，感觉这个比较正常嘛，虽然上面那个结果也对。</li>
+</ul>
+<h2 id="我手动计算一下"><a href="#我手动计算一下" class="headerlink" title="我手动计算一下"></a>我手动计算一下</h2><ul>
+<li>最优解肯定在边界上，也就是线段：</li>
+</ul>
+<img src="https://cdn.jsdelivr.net/gh/20040116/pictures-for-my-blog/line_exp_1_3%EF%BC%882%EF%BC%89.png" width="250" alt="modeling1" align="center"> 
+
+
+<ul>
+<li>毕竟是学Matlab嘛，所以就画了张图：</li>
+</ul>
+<img src="https://cdn.jsdelivr.net/gh/20040116/pictures-for-my-blog/exp1_3.png" width alt="modeling1" align="center"> 
+
+<p><strong>蓝色的线为该直线</strong></p>
+]]></content>
+      <categories>
+        <category>Study Experience</category>
+      </categories>
+      <tags>
+        <tag>Mathematical Modeling</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>大一总结</title>
     <url>/2021/07/09/my-first-blog/</url>
     <content><![CDATA[<p><strong>概述：对于每一个学期，我会从“学期伊始”、“学期中”、“期末”三个时间点入手，以“流水账”的形式简单记录一下我的心理状态和日常生活。然后，我会写几件我印象深刻，且对我自己产生比较大影响的事。最后，做一个总结。最后的最后，我会写一下对下个学年的展望和期许。</strong></p>
