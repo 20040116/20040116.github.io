@@ -38,6 +38,39 @@
       </tags>
   </entry>
   <entry>
+    <title>python-study-experience-1</title>
+    <url>/2021/07/12/python-study-experience-1/</url>
+    <content><![CDATA[<p><strong>引言：最近在自学Python，学习基础部分用的书是《Python编程——从入门到实践》2016版（最新版借不到），很经典的一本书。除了“外星人入侵”和“Web应用程序”这两个项目感觉不是很有必要，其他部分都看完了。然后，在数据可视化的其中一节，我发现了一个书里的bug。如果有最新版书的小伙伴，可以查证一下，看这个bug还在不在。如果有学习Python的好的书或课程，也可以推荐给我一下，不胜感激。</strong></p>
+<h3 id="关于该bug的说明"><a href="#关于该bug的说明" class="headerlink" title="关于该bug的说明"></a>关于该bug的说明</h3><ul>
+<li>位于P349页，”python_repos.py”的部分代码。</li>
+</ul>
+<p><strong>python_repos.py</strong></p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">--snip--</span><br><span class="line"><span class="comment">#研究有关仓库的信息</span></span><br><span class="line">repo_dicts = response_dict[<span class="string">&#x27;item&#x27;</span>]</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Number of items:&quot;</span>, <span class="built_in">len</span>(repo_dicts))</span><br><span class="line"></span><br><span class="line">names, plot_dicts = [], []</span><br><span class="line"><span class="keyword">for</span> repo_dict repodicts:</span><br><span class="line">	names.append(repo_dict[<span class="string">&#x27;name&#x27;</span>])</span><br><span class="line">	</span><br><span class="line">	plot_dict = &#123;</span><br><span class="line">		<span class="string">&#x27;value&#x27;</span>: repo_dict[<span class="string">&#x27;stargazers_count&#x27;</span>],</span><br><span class="line">		<span class="string">&#x27;label&#x27;</span>: repo_dict[<span class="string">&#x27;description&#x27;</span>],</span><br><span class="line">		&#125;</span><br><span class="line">	plot_dicts.append(plot.<span class="built_in">dict</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#可视化</span></span><br><span class="line">my_style = LS(<span class="string">&#x27;#333366&#x27;</span>, base_style=LCS)</span><br><span class="line">--snip--</span><br><span class="line"></span><br><span class="line">chart.add(<span class="string">&#x27;&#x27;</span>, plot_dicts)</span><br><span class="line">chart.render_to_file(<span class="string">&#x27;pthon_repo.svg&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>本节的目的是用API调用返回Github上30个项目，然后按照得到stars的数量排序，利用Pygal做一个条形图。</p>
+</li>
+<li><p>问题出在如上所示代码的第12行“’label’: repo_dict[‘description’]”，这一行的作用是获得每一个项目的“description”。但不是所有的项目都有description(虽然一般受欢迎的项目都有)，我测试代码时获取的前30个项目中的第28名就没有description，然后会报错“NoneType”。具体情况见下图。<img src="https://cdn.jsdelivr.net/gh/20040116/pictures-for-my-blog/bug1.png" width alt="一个大瓜" align="center"></p>
+</li>
+<li><p>解决方法也很简单，就是判断一下有没有“description”.代码如下：</p>
+</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">--snip--</span><br><span class="line"><span class="keyword">for</span> repo_dict <span class="keyword">in</span> repo_dicts:</span><br><span class="line">    names.append(repo_dict[<span class="string">&#x27;name&#x27;</span>])</span><br><span class="line">    stars.append(repo_dict[<span class="string">&#x27;stargazers_count&#x27;</span>])</span><br><span class="line">    plot_dict = &#123;</span><br><span class="line">        <span class="string">&#x27;value&#x27;</span>: repo_dict[<span class="string">&#x27;stargazers_count&#x27;</span>],</span><br><span class="line">        <span class="string">&#x27;xlink&#x27;</span>: repo_dict[<span class="string">&#x27;html_url&#x27;</span>],</span><br><span class="line">        <span class="comment">#&#x27;label&#x27;: repo_dict[&#x27;description&#x27;]</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> repo_dict[<span class="string">&#x27;description&#x27;</span>] == <span class="literal">None</span>:</span><br><span class="line">        plot_dict[<span class="string">&#x27;label&#x27;</span>] = <span class="string">&#x27;No description&#x27;</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        plot_dict[<span class="string">&#x27;label&#x27;</span>] = repo_dict[<span class="string">&#x27;description&#x27;</span>]</span><br><span class="line">    plot_dicts.append(plot_dict)</span><br><span class="line">--snip--</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>正常情况下的运行结果是这样的：<img src="https://cdn.jsdelivr.net/gh/20040116/pictures-for-my-blog/python_repos.svg" width alt="一个大瓜" align="center"><a href="https://cdn.jsdelivr.net/gh/20040116/pictures-for-my-blog/python_repos(2).svg"><strong>该图链接</strong></a><strong>（注：查看原图可以获得更多信息）</strong></p>
+</li>
+<li><p><strong>但是，为什么这个项目没有description呢？</strong>我很好奇，就去看了看，然后发现一个大瓜，好奇读者可以自行去查看。</p>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>Study Experience</category>
+      </categories>
+      <tags>
+        <tag>python</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>大一总结</title>
     <url>/2021/07/09/my-first-blog/</url>
     <content><![CDATA[<p><strong>概述：对于每一个学期，我会从“学期伊始”、“学期中”、“期末”三个时间点入手，以“流水账”的形式简单记录一下我的心理状态和日常生活。然后，我会写几件我印象深刻，且对我自己产生比较大影响的事。最后，做一个总结。最后的最后，我会写一下对下个学年的展望和期许。</strong></p>
@@ -150,36 +183,49 @@
       </tags>
   </entry>
   <entry>
-    <title>python-study-experience-1</title>
-    <url>/2021/07/12/python-study-experience-1/</url>
-    <content><![CDATA[<p><strong>引言：最近在自学Python，学习基础部分用的书是《Python编程——从入门到实践》2016版（最新版借不到），很经典的一本书。除了“外星人入侵”和“Web应用程序”这两个项目感觉不是很有必要，其他部分都看完了。然后，在数据可视化的其中一节，我发现了一个书里的bug。如果有最新版书的小伙伴，可以查证一下，看这个bug还在不在。如果有学习Python的好的书或课程，也可以推荐给我一下，不胜感激。</strong></p>
-<h3 id="关于该bug的说明"><a href="#关于该bug的说明" class="headerlink" title="关于该bug的说明"></a>关于该bug的说明</h3><ul>
-<li>位于P349页，”python_repos.py”的部分代码。</li>
+    <title>一次惨痛的教训</title>
+    <url>/2021/07/15/%E4%B8%80%E6%AC%A1%E6%83%A8%E7%97%9B%E7%9A%84%E6%95%99%E8%AE%AD/</url>
+    <content><![CDATA[<h2 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h2><ul>
+<li>学校不是搞什么安全教育嘛，要看一大堆网课，每节课后还有习题，总之烦得要死。于是，就想着找一个脚本水过去就行了。去CSDN上随便查了一篇相关博客，然后，随便点了其中一个链接下载。因为平时用CSDN比较多，确实很有帮助，所以想都没想就安装了<strong>“安全性未知”</strong>的.exe文件。然后，我的电脑就开始疯狂安装各种恶意软件。</li>
 </ul>
-<p><strong>python_repos.py</strong></p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">--snip--</span><br><span class="line"><span class="comment">#研究有关仓库的信息</span></span><br><span class="line">repo_dicts = response_dict[<span class="string">&#x27;item&#x27;</span>]</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Number of items:&quot;</span>, <span class="built_in">len</span>(repo_dicts))</span><br><span class="line"></span><br><span class="line">names, plot_dicts = [], []</span><br><span class="line"><span class="keyword">for</span> repo_dict repodicts:</span><br><span class="line">	names.append(repo_dict[<span class="string">&#x27;name&#x27;</span>])</span><br><span class="line">	</span><br><span class="line">	plot_dict = &#123;</span><br><span class="line">		<span class="string">&#x27;value&#x27;</span>: repo_dict[<span class="string">&#x27;stargazers_count&#x27;</span>],</span><br><span class="line">		<span class="string">&#x27;label&#x27;</span>: repo_dict[<span class="string">&#x27;description&#x27;</span>],</span><br><span class="line">		&#125;</span><br><span class="line">	plot_dicts.append(plot.<span class="built_in">dict</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#可视化</span></span><br><span class="line">my_style = LS(<span class="string">&#x27;#333366&#x27;</span>, base_style=LCS)</span><br><span class="line">--snip--</span><br><span class="line"></span><br><span class="line">chart.add(<span class="string">&#x27;&#x27;</span>, plot_dicts)</span><br><span class="line">chart.render_to_file(<span class="string">&#x27;pthon_repo.svg&#x27;</span>)</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><p>本节的目的是用API调用返回Github上30个项目，然后按照得到stars的数量排序，利用Pygal做一个条形图。</p>
+<h2 id="经过"><a href="#经过" class="headerlink" title="经过"></a>经过</h2><ul>
+<li><p>一开始我是不慌的，以为这次就像360那样，虽然软件流氓，但我只要到软件管理那里卸载捆绑的程序就行了。于是，我就到“程序卸载”那里，把新安装的各种垃圾软件都“卸掉”了，然后重启电脑。</p>
 </li>
-<li><p>问题出在如上所示代码的第12行“’label’: repo_dict[‘description’]”，这一行的作用是获得每一个项目的“description”。但不是所有的项目都有description(虽然一般受欢迎的项目都有)，我测试代码时获取的前30个项目中的第28名就没有description，然后会报错“NoneType”。具体情况见下图。<img src="https://cdn.jsdelivr.net/gh/20040116/pictures-for-my-blog/bug1.png" width alt="一个大瓜" align="center"></p>
-</li>
-<li><p>解决方法也很简单，就是判断一下有没有“description”.代码如下：</p>
+<li><p>重启完打开电脑我就蒙了，各种垃圾软件又自动安装，全都回来了。我又重新试着全部卸掉，重启电脑，然后结果一样，各种垃圾软件又回来了。更诡异的是，每次都有“不重样”的流氓软件出现，而且有些甚至不会出现在控制面板的“程序卸载”的位置，比如<strong>“小黑记事本”</strong>。到此，我意识到电脑中“病毒”了，虽然严格意义上说并不是病毒，但这种性质的流氓软件确实可以称之为<strong>病毒</strong>。</p>
 </li>
 </ul>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">--snip--</span><br><span class="line"><span class="keyword">for</span> repo_dict <span class="keyword">in</span> repo_dicts:</span><br><span class="line">    names.append(repo_dict[<span class="string">&#x27;name&#x27;</span>])</span><br><span class="line">    stars.append(repo_dict[<span class="string">&#x27;stargazers_count&#x27;</span>])</span><br><span class="line">    plot_dict = &#123;</span><br><span class="line">        <span class="string">&#x27;value&#x27;</span>: repo_dict[<span class="string">&#x27;stargazers_count&#x27;</span>],</span><br><span class="line">        <span class="string">&#x27;xlink&#x27;</span>: repo_dict[<span class="string">&#x27;html_url&#x27;</span>],</span><br><span class="line">        <span class="comment">#&#x27;label&#x27;: repo_dict[&#x27;description&#x27;]</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> repo_dict[<span class="string">&#x27;description&#x27;</span>] == <span class="literal">None</span>:</span><br><span class="line">        plot_dict[<span class="string">&#x27;label&#x27;</span>] = <span class="string">&#x27;No description&#x27;</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        plot_dict[<span class="string">&#x27;label&#x27;</span>] = repo_dict[<span class="string">&#x27;description&#x27;</span>]</span><br><span class="line">    plot_dicts.append(plot_dict)</span><br><span class="line">--snip--</span><br></pre></td></tr></table></figure>
-<ul>
-<li><p>正常情况下的运行结果是这样的：<img src="https://cdn.jsdelivr.net/gh/20040116/pictures-for-my-blog/python_repos.svg" width alt="一个大瓜" align="center"><a href="https://cdn.jsdelivr.net/gh/20040116/pictures-for-my-blog/python_repos(2).svg"><strong>该图链接</strong></a><strong>（注：查看原图可以获得更多信息）</strong></p>
+<h2 id="尝试解决问题"><a href="#尝试解决问题" class="headerlink" title="尝试解决问题"></a>尝试解决问题</h2><ul>
+<li><p>首先，我先用腾讯的电脑管家全盘扫描清理了一遍，没有啥用。</p>
 </li>
-<li><p><strong>但是，为什么这个项目没有description呢？</strong>我很好奇，就去看了看，然后发现一个大瓜，好奇读者可以自行去查看。</p>
+<li><p>然后，我又去下载了卡巴斯基，也是全盘扫描清理了一下，依然没有任何作用。</p>
+</li>
+<li><p>此时，我已经很慌了，不知道该怎么办。偶然间在任务管理器中发现垃圾软件都在C盘，我就去手动删除<strong>“所有能删”</strong>的“在那个时间段”新创建的文件。</p>
+</li>
+<li><p>既然有“能删的”，那必然还有“无法删除”的文件，就是一些.dll文件，不知道什么原因在“资源管理器”中运行，但又在“资源管理器”中找不到。此时，我已经把垃圾软件的文件都删得差不多了。但是，怎么都找不到<strong>“小黑记事本”</strong>到底安装在哪了。</p>
+</li>
+<li><p>感觉<strong>“小黑记事本”</strong>就是<strong>“万恶之源”</strong>，因为只有这个在前两次尝试中没有删除，然后每次重启垃圾软件就“卷土重来”。没办法，就挨个检查C盘的所有文件，找到最近添加的删掉。自此，已经过去了差不多3个小时。、</p>
+</li>
+</ul>
+<h2 id="结果"><a href="#结果" class="headerlink" title="结果"></a>结果</h2><ul>
+<li><p>后面我去知乎上查了查，发现可以用腾讯管家的“文件粉碎”工具来彻底清除那些无法删掉的.dll文件。只有一个例外，删除该文件时提示，被“Security Netcore Service”调用，且无法粉碎。我就修改了这个文件的名称和后缀，重启电脑后，发现可以直接删除了。重启电脑后，垃圾软件没有回来，应该是删除干净了，毕竟花了几小时把C盘“翻了个底朝天”。</p>
+</li>
+<li><p>最后，又花了一点时间来修复被“小黑记事本”篡改的文件类型。比如，“.xml”文件会被修改为“小黑记事本.xml”文件，就很烦人，不是很清楚原因。</p>
+</li>
+</ul>
+<h2 id="一点感悟"><a href="#一点感悟" class="headerlink" title="一点感悟"></a>一点感悟</h2><ul>
+<li><p>去百度和知乎查阅相关资料时，我发现有很多人也深受“小黑记事本”这种极其恶劣的垃圾软件之害，有些实在没办法，放弃抵抗，重装系统。</p>
+</li>
+<li><p>有些人也尝试去举报开发这种软件的公司，都没有什么效果。流氓软件广泛存在于当今互联网，随便去百度上下载什么软件，只要不是官方网站，几乎全是类似的流氓软件，这种现象也很难根除。</p>
+</li>
+<li><p>只能说，大家一定要保持警惕，除非完全信任安装来源（比如，同学提供的有效资源）。否则，一定不要安装不能通过杀毒软件安全检测的软件。</p>
 </li>
 </ul>
 ]]></content>
       <categories>
-        <category>Study Experience</category>
+        <category>随笔</category>
       </categories>
       <tags>
-        <tag>python</tag>
+        <tag>软件安装经验</tag>
       </tags>
   </entry>
 </search>
